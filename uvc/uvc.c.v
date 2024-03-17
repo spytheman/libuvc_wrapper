@@ -1,10 +1,8 @@
 module uvc
 import time
 
-#flag -I /lib64/libuvc/include/
-#flag -luvc
 #include <libuvc/libuvc.h>
-#include <libuvc/libuvc_config.h>
+#flag -luvc
 #include <stdio.h>
 
 fn C.uvc_init(
@@ -40,6 +38,10 @@ fn C.uvc_print_stream_ctrl(&C.uvc_stream_ctrl_t, &C.FILE)
 fn C.uvc_set_ae_mode(&C.uvc_device_handle_t, u8) ErrorT
 
 fn C.uvc_stop_streaming(&C.uvc_device_handle_t)
+
+fn C.uvc_mjpeg2rgb(&C.uvc_frame_t, &C.uvc_frame_t) ErrorT // in, out
+
+fn C.uvc_allocate_frame(int) &C.uvc_frame_t
 
 @[typedef]
 struct C.FILE {}
@@ -84,6 +86,15 @@ struct C.uvc_still_frame_desc {}
 struct C.uvc_format_desc{}
 
 pub struct C.uvc_frame{
+	data voidptr  // pointer to data
+	data_bytes int  // nb of bytes
+	width u32
+	height u32
+	step int
+}
+
+@[typedef]
+pub struct C.uvc_frame_t{
 	data voidptr  // pointer to data
 	data_bytes int  // nb of bytes
 	width u32
@@ -312,4 +323,11 @@ pub fn base(cb fn (frame &C.uvc_frame, user_ptr voidptr)) {
 
 fn fix_a_bytestr(a [4]u8) string {
 	return []u8{len:4, init:a[index]}.bytestr()
+}
+
+pub fn mjpegframe_rgb(input &C.uvc_frame) []u8 {
+	output_frame := C.uvc_allocate_frame(input.width*input.height*3)
+	C.uvc_mjpeg2rgb(&C.uvc_frame_t(input), output_frame)
+	output_data := &u8(output_frame.data)
+	return []u8{len:output_frame.data_bytes, init:output_data[index]}
 }

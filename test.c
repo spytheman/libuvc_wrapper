@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
- // gcc  -I /lib64/libuvc/include/ test.c -o test -luvc && sudo ./test
+ // gcc test.c -o test -luvc && sudo ./test
  
 /*
 try to call that from V (just wrap the thing into a C function)
