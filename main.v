@@ -4,7 +4,8 @@ import uvc
 import gg
 import log
 
-fn C.uvc_any2rgb(inp &C.uvc_frame_t, out &C.uvc_frame_t) uvc.ErrorT
+const wwidth = 640
+const wheight = 480
 
 struct App {
 mut:
@@ -16,11 +17,11 @@ mut:
 }
 
 fn (mut app App) init() {
-	app.istream_idx = app.gg.new_streaming_image(640, 480, 4, pixel_format: .rgba8)
-	app.output_rgba8 = unsafe { malloc(640 * 480 * 3) }
-	app.output_frame = C.uvc_allocate_frame(640 * 480 * 4)
-	app.output_frame.width = 640
-	app.output_frame.height = 480
+	app.istream_idx = app.gg.new_streaming_image(wwidth, wheight, 4, pixel_format: .rgba8)
+	app.output_rgba8 = unsafe { malloc(wwidth * wheight * 3) }
+	app.output_frame = C.uvc_allocate_frame(wwidth * wheight * 4)
+	app.output_frame.width = wwidth
+	app.output_frame.height = wheight
 	app.output_frame.frame_format = .rgb
 	app.output_frame.library_owns_data = 0
 	log.info('app.istream_idx: ${app.istream_idx}')
@@ -45,19 +46,19 @@ fn cb(frame &C.uvc_frame_t, mut app App) {
 }
 
 fn (mut app App) convert_output_frame_to_rgba8() {
-	npixels := 640 * 480
+	// vfmt off
+	npixels := wwidth * wheight
+	unsafe {		
 	mut ps := &u8(app.output_frame.data)
 	mut pt := &u8(app.output_rgba8)
 	for _ in 0 .. npixels {
-		// vfmt off
-		unsafe {		
 			*pt = *ps; pt++; ps++
 			*pt = *ps; pt++; ps++
 			*pt = *ps; pt++; ps++
 			*pt = 255; pt++;
 		}
-		// vfmt on
 	}
+	// vfmt on
 }
 
 fn main() {
@@ -65,8 +66,8 @@ fn main() {
 	app.gg = gg.new_context(
 		window_title: 'Webcam Viewer'
 		bg_color: gg.Color{5, 5, 5, 255}
-		width: 640
-		height: 480
+		width: wwidth
+		height: wheight
 		init_fn: app.init
 		frame_fn: app.frame
 		user_data: app

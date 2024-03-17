@@ -1,5 +1,8 @@
 module uvc
 
+#flag darwin -I/opt/homebrew/include
+#flag darwin -L/opt/homebrew/lib
+
 #include <libuvc/libuvc.h>
 #flag -luvc
 
@@ -77,14 +80,30 @@ pub enum ErrorT {
 @[typedef]
 struct C.uvc_stream_ctrl_t {}
 
+fn (c &C.uvc_stream_ctrl_t) str() string {
+	return '&C.uvc_stream_ctrl_t{}'
+}
+
 @[typedef]
 struct C.uvc_context_t {}
+
+fn (c &C.uvc_context_t) str() string {
+	return '&C.uvc_context_t{}'
+}
+
+@[typedef]
+struct C.uvc_device_t {}
+
+fn (c &C.uvc_device_t) str() string {
+	return '&C.uvc_device_t{}'
+}
 
 @[typedef]
 struct C.uvc_device_handle_t {}
 
-@[typedef]
-struct C.uvc_device_t {}
+fn (c &C.uvc_device_handle_t) str() string {
+	return '&C.uvc_device_handle_t{}'
+}
 
 struct C.uvc_streaming_interface {}
 
@@ -149,6 +168,8 @@ struct C.uvc_format_desc_t {
 	frame_descs          &C.uvc_frame_desc
 	still_frame_desc     &C.uvc_still_frame_desc
 }
+
+fn C.uvc_any2rgb(inp &C.uvc_frame_t, out &C.uvc_frame_t) ErrorT
 
 fn C.uvc_init(ctx &&C.uvc_context_t, usb_ctx &C.libusb_context) ErrorT
 
