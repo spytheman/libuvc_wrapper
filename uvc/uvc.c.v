@@ -1,8 +1,5 @@
 module uvc
 
-#flag darwin -I/opt/homebrew/include
-#flag darwin -L/opt/homebrew/lib
-
 #include <libuvc/libuvc.h>
 #flag -luvc
 
@@ -81,28 +78,28 @@ pub enum ErrorT {
 struct C.uvc_stream_ctrl_t {}
 
 fn (c &C.uvc_stream_ctrl_t) str() string {
-	return '&C.uvc_stream_ctrl_t{}'
+	return 'C.uvc_stream_ctrl_t{}'
 }
 
 @[typedef]
 struct C.uvc_context_t {}
 
 fn (c &C.uvc_context_t) str() string {
-	return '&C.uvc_context_t{}'
+	return 'C.uvc_context_t{}'
 }
 
 @[typedef]
 struct C.uvc_device_t {}
 
 fn (c &C.uvc_device_t) str() string {
-	return '&C.uvc_device_t{}'
+	return 'C.uvc_device_t{}'
 }
 
 @[typedef]
 struct C.uvc_device_handle_t {}
 
 fn (c &C.uvc_device_handle_t) str() string {
-	return '&C.uvc_device_handle_t{}'
+	return 'C.uvc_device_handle_t{}'
 }
 
 struct C.uvc_streaming_interface {}
@@ -230,7 +227,7 @@ pub fn start_streaming(cb FnFrameCallback, context voidptr) StreamingHandles {
 		C.uvc_perror(res, c'uvc_init')
 		exit(0)
 	}
-	println('UVC initialized')
+	println('UVC initialized, ctx: ${voidptr(ctx)}')
 	// Locates the first attached UVC device, stores in dev
 	res = C.uvc_find_device(ctx, &dev, 0, 0, unsafe { nil }) // seem to init the device
 	if int(res) < 0 {
