@@ -293,6 +293,8 @@ pub fn base(cb fn (frame &C.uvc_frame, user_ptr voidptr)) {
 					} else {
 						C.uvc_perror(res, c" ... uvc_set_ae_mode failed to enable auto exposure mode")
 					}
+					a := &C.uvc_frame(unsafe{nil})
+					cb(a, &ctrl)
 					time.sleep(400_000_000) /* stream for 0.4 seconds */
 			
 					/* End the stream. Blocks until last callback is serviced */
